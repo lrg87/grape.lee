@@ -1,0 +1,92 @@
+#!/usr/bin/env python
+# -*- coding:UTF-8 -*-
+#@Time:2017/1/20 下午11:17
+#@Author:grape.lee
+#@File:auto_publish
+#@Software:PyCharm Community Edition
+#!/usr/bin/env python
+#coding=utf8
+#export config from eless
+import requests
+import json
+import sys
+import time
+
+s = requests.Session()
+
+
+headers1={
+        "Cookie":"_ga=GA1.2.401943586.1461500781; COFFEE_TOKEN=af6fa593-fe33-49b5-9f05-d872a6f45b87; csrftoken=I2W1XYsVFvoH6EvlVhJ4xqb0dYaD1cUw; sessionid=ur6v6sl1t2rf2hae9c45iwetath45pyy",
+        "Origin":"http://eless.tools.elenet.me",
+        "Referer":"http://eless.tools.elenet.me/view/app/",
+        "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36",
+        "X-Requested-With":"XMLHttpRequest"
+        }
+headers = {"Origin":"http://eless.tools.elenet.me","Referer":"http://eless.tools.elenet.me/view/app/"}
+headers.update(headers1)
+
+#cookies = {"COFFEE_TOKEN":"f57b2bc1-3404-4fe8-9d75-608871b1b0b4","_ga":"GA1.2.1370799952.1467507047","csrftoken":"rVIeLdEPA1pzltbOpy8vKX0SJF5MgHIz","sessionid":"o872uvoo58cdsb7ty2h19tosquhbmmx5"}
+
+def get_content(url):
+    res=s.get(url,headers=headers)
+    return res
+
+
+def post_publish(url,appid,pushsetid):
+    body={
+        "csrfmiddlewaretoken":"I2W1XYsVFvoH6EvlVhJ4xqb0dYaD1cUw",
+        "app_id":appid.strip(),
+        "pushsetid":pushsetid,
+        "environment":"beta",
+        "workflow_scope":"beta",
+        "env_scope":"beta",
+        "groupname":"group1",
+        "ezone":"alta1"
+        }
+    ex_info = s.post(url,headers=headers,data=body)
+    print ex_info.text,ex_info,appid.strip()
+
+if __name__ == "__main__":
+    file=sys.argv[1]
+    import time
+    t=time.localtime()
+    flag=time.strftime('%Y-%m-%d_%H_%M_%S', t)
+    log_file="{0}.{1}".format(file,flag)
+    print log_file
+    operation=sys.argv[2]
+    publish_url ="http://eless.tools.elenet.me/api/workflow/normal_release/?format=json"
+    with open(file,"rb") as f:
+        if operation == "publish":
+            for appid in f:
+                if appid.strip():
+                  try:
+                    view_url="http://eless.tools.elenet.me/api/prodworkflow/get_rollinghistory/?format=json&app_id={0}&buffer=0&pagesize=1".format(appid.strip())
+                    res=get_content(view_url)
+                    if str(res.status_code).startswith('2'):
+                        try:
+                            pushsetid=res.json()[0].get("pushset").get("id")
+                        except Exception as e:
+                            print e,appid.strip()
+                            pushsetid=0
+                    else:
+                        pushsetid=0
+                #    pushsetid=592184
+                    post_publish(publish_url,appid,pushsetid)
+                    end_url='http://eless.tools.elenet.me/api/get_releasenote/?format=json&pushsetid={pushsetid}&workflow_scope=beta&environment=beta&ezone=alta1'.format(pushsetid=pushsetid)
+                    res=get_content(end_url)
+                    release_id=res.json().get("rn_dict")[0].get("latest").get("id")
+                    relaase_res_url="http://eless.tools.elenet.me/api/deploystatus/?format=json&releaseid={0}".format(release_id)
+                    print relaase_res_url
+                    log_f=open(log_file,"a")
+                    log_f.write("{0}\n".format(relaase_res_url))
+                    log_f.close()
+                    print "sleep(10)"
+                #    res=get_content(relaase_res_url)
+                #    print res.json().get("data").get("hosts")
+                    time.sleep(30)
+                  except Exception as e:
+                      print appid.strip(),e
+        elif operation == "check":
+            for url in f:
+                res=get_content(url.strip())
+                print res.json().get("data").get("hosts")
