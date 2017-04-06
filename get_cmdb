@@ -24,7 +24,7 @@ sys.setdefaultencoding('utf8')
 def get_cmdb_client():
     client_id = ''
     secret = ''
-    host = 'cmdb.elenet.me'
+    host = ''
     port = 8080
     return Client(host=host, port=port, client_id=client_id, secret=secret)
 
