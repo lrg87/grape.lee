@@ -15,7 +15,7 @@ def login(username,password):
     '''
     with open('user_file','r') as f:
         for line in f.readlines():
-            if line.split('|')[0] == username and line.split('|')[1] == password:
+            if line.strip().split('|')[0] == username and line.strip().split('|')[1] == password:
                 print('welcome to login')
                 return True
         return False
