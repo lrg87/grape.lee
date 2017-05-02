@@ -17,7 +17,7 @@ while True:
     got_things=goods[goods_buy][0]
     if price < salary:
         shop_car.append(got_things)
-        print("you had buy %s" % got_things)
+        print("you had buy \033[31;1m %s \033[0m" % got_things)
         salary -= price
         continue
     else:
