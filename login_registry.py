@@ -19,13 +19,11 @@ def login(username,password):
                 print('welcome to login')
                 return True
         return False
-    f.close()
 
 
 def registry(username,password):
     with open('user_file','a') as f:
         f.write('\n' + username + '|' + password)
-        f.close()
 
 
 def main():
