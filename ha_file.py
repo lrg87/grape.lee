@@ -56,11 +56,12 @@ def add(backend,registry):
                         for tmp in result:
                             new.write(" "*8 + tmp + '\n')#' '表示空格里边要留空。
                             print(tmp)
+                        continue#continue判断加在这里
                     if flag and line.strip().startswith('backend'):
                         flag = False
                         #new.write(line)
                         #print(line)
-                        continue
+                        #continue
                     if line.strip() and not flag:
                         new.write(line)
                         print(line,'test-1')
