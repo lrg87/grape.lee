@@ -64,7 +64,7 @@ def add(backend,registry):
                         #continue
                     if line.strip() and not flag:
                         new.write(line)
-                        print(line,'test-1')
+                        #print(line,'test-1')
                      #   print('你好')
 
 bk="www.oldboy.org"
