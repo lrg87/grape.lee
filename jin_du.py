@@ -9,7 +9,7 @@ import time,sys
 def view_bar(num,total):
     rate = num / total
     rate_num = int(rate * 100)
-    ret = ("\r%s=>%d%%" % ('#'*num,rate_num))
+    ret = ("\r%s=>%d%%" % ('#'*num,rate_num))#\r删除之前产生的
     sys.stdout.write(ret)
 
 
